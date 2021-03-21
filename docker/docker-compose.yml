@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  php:
+    build: 
+      context: ./php
+    volumes:
+      - ../src:/var/www
+
+  nginx:
+    build:
+      context: ./nginx
+    volumes:
+      - ../src:/var/www
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/sites/:/etc/nginx/sites-available
+      - ./nginx/conf.d/:/etc/nginx/conf.d
+    depends_on:
+      - php
+    ports:
+      - "80:80"
+      - "443:443"
+
+  mysql:
+    build:
+      context: ./mysql
+    environment:
+      - MYSQL_DATABASE=usersdb
+      - MYSQL_USER=usersdb_user
+      - MYSQL_PASSWORD=temp1234
+      - MYSQL_ROOT_PASSWORD=temp1234
+    volumes:
+      - ./mysql/users.sql:/docker-entrypoint-initdb.d/users.sql
